@@ -15,6 +15,7 @@ Execute the following commands to start the service containers (`web` and `db` i
 ```bash
 docker compose build
 docker compose up
+docker compose exec web npx sequelize-cli db:migrate
 ```
 
 The app will run on `localhost:3000` and the DB server will run on port `5432`.
@@ -134,8 +135,30 @@ Create `app/views/layouts/application.ejs` for the main layout of the applicatio
 
 Add HTML, CSS, logos, images and other static content for the Welcome Page
 
+### Configuring Passport.js
+
+Install `passport` and `web-authn` packages
+
+Create a `passport-service.js` file and set the `passport` up to use the `WebAuthnStrategy`
+
+```bash
+docker compose exec web npm install passport --save
+docker compose exec web npm install passport-fido2-webauthn --save
+```
+
+Invoke a `SessionChallengeStore` in **routes.js** and initialize the `passportService` and pass the store to the `passportService` object
+
+The `WebAuthn` strategy will allow our server to generate a challenge that can be used during the attestation (register) and assertion (login) phases.
+
 _To be continued..._
 
 ### Additional Notes
 
 - You can use **pgAdmin 4** PostgreSQL Client to connect to the database from UI
+- If you're getting an error like `PostgreSQL Database directory appears to contain a database; Skipping initialization`, run the following command and start the db service again
+
+```bash
+docker-compose down --volumes
+```
+
+
